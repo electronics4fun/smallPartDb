@@ -1,12 +1,8 @@
-import json
 from os import listdir
 from os.path import isfile, join
 from glob import glob
 
 from engineering_notation import EngNumber
-
-import smallPartDb
-
 
 
 E12 = [10, 12, 15, 18, 22, 27, 33, 39, 47, 56, 68, 82]
