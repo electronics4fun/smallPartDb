@@ -16,6 +16,7 @@ Small python class for interfacing [Part-Db](https://github.com/Part-DB/Part-DB-
 Currently tested with Part-Db Version 1.11.3
 
 ## Requirements
+* Setup a user for API access in Part-Db.
 * Setup a file with name "settings.yaml" with your credentials like:
 ```python
 {
@@ -23,7 +24,6 @@ Currently tested with Part-Db Version 1.11.3
     host : "localhost"
 }
 ```
-* Setup a user for API access in Part-Db.
 * Take a look at "partDbExample.py" for usage.
 
 ## Install
@@ -36,10 +36,8 @@ Settings parameter max-value and min-value seems to have a problem.
 ## Maintainers
 [@electronics4fun](https://github.com/electronics4fun)
 
-
 ## Contributing
 Feel free to dive in! [Open an issue](https://github.com/electronics4fun/smallPartDb/issues/new) or submit PRs.
-
 
 ## License
 [MIT](LICENSE)
