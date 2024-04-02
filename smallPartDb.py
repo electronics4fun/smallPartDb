@@ -15,7 +15,7 @@ import urllib.parse
 
 
 # config the logging behavior
-logging.basicConfig(filename='log.log',level=logging.DEBUG)
+logging.basicConfig(filename='log.log', level=logging.DEBUG)
 
 class Endpoint():
     base_url = ""
@@ -42,6 +42,7 @@ class Endpoint():
     footprintsId = ""
     parameters = ""
     parametersId = ""
+    partsearch = ""
 
     def __init__(self, base_url):
         self.base_url = base_url
@@ -69,6 +70,7 @@ class Endpoint():
         self.footprintsId = base_url + "footprints/{id}"
         self.parameters = base_url + "parameters"
         self.parametersId = base_url + "parameters/{id}"
+        self.partsearch = base_url + "parts.jsonld?name={phrase}"
   
 class smallPartDb():
     host = None
@@ -82,18 +84,24 @@ class smallPartDb():
     attachments = []
     footprints = []
     attachmentTypes = []
+    token = None
 
     def __init__(self, host, token):
         self.host = host
+        self.token = token
         self.endpoint = Endpoint("http://" + self.host + "/api/")
 
-        self.header = {'Content-Type': 'application/json', 'User-Agent':'APS-DB-Converter', 'Accept': 'application/json', 'Authorization': 'Bearer ' + token}
+        self.header = {'Content-Type': 'application/json', 'User-Agent':'smallPartDb', 'Accept': 'application/json', 'Authorization': 'Bearer ' + token}
         self.r = requests.Session()
         self.r.headers.update(self.header)
 
-        self.headerPatch = {'Content-Type': 'application/merge-patch+json', 'User-Agent':'APS-DB-Converter', 'Accept': 'application/ld+json', 'Authorization': 'Bearer ' + token}
+        self.headerPatch = {'Content-Type': 'application/merge-patch+json', 'User-Agent':'smallPartDb', 'Accept': 'application/ld+json', 'Authorization': 'Bearer ' + token}
         self.rUpdate = requests.Session()
         self.rUpdate.headers.update(self.headerPatch)
+
+        self.searchSearch = {'Content-Type': 'application/ld+json', 'User-Agent':'smallPartDb', 'Accept': 'application/ld+json', 'Authorization': 'Bearer ' + token}
+        self.rSearchPart = requests.Session()
+        self.rSearchPart.headers.update(self.searchSearch)
 
         self.getInfo()
     
@@ -515,6 +523,13 @@ class smallPartDb():
             warnings.warn("no manufacturer found for >" + name + "<")
         return manufacturersId
     
+    def searchPart(self, phrase):
+        phrase = urllib.parse.quote(phrase)
+
+        url = self.endpoint.partsearch.format(phrase=phrase)
+        print(url)
+        return self.rSearchPart.get(url)
+
     def getParts(self):
         url = self.endpoint.parts.format()
         p = 1
@@ -585,7 +600,7 @@ class smallPartDb():
 
 if __name__ == '__main__':
     
-    with open("settings.yaml") as stream:
+    with open("./smallPartDb/settings.yaml") as stream:
         try:
             settings = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
@@ -600,3 +615,11 @@ if __name__ == '__main__':
     if status.status_code == 200:
         for p in partDb.parts:
             print(str(p['id']) + ": " + p['name'])
+    
+    print("search...")
+    resp = partDb.searchPart("BC547")
+    if resp.status_code == 200:
+        print(json.dumps(resp.text))
+    else:
+        print("Error while search: " + str(resp.status_code))
+    
