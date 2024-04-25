@@ -29,13 +29,14 @@ E192 = [100, 101, 102, 104, 105, 106, 107, 109, 110, 111, 113, 114, 115, 117, 11
           634, 642, 649, 657, 665, 673, 681, 690, 698, 706, 715, 723, 732, 741, 750, 759, 768, 777, 787, 796, 806, 816,
           825, 835, 845, 856, 866, 876, 887, 898, 909, 920, 931, 942, 953, 965, 976, 988]
 
-MinMaxE96 = [1, 10000000]
+MinMaxE96 = [10, 1000000]
+MinMaxE24 = [10, 1000000]
 
 MultiFact = [0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000, 100000]
 
 
-class yaegoResistors():
-    techType = None # APS Type
+class yageoResistors():
+    techType = None
     size = "0603"
     tolerance = "F"
     packaging = "R"
@@ -70,7 +71,7 @@ class yaegoResistors():
             vStr = vStr.rstrip('0')
         return vStr[0:4]
 
-    def generateYaegoNumbers(self, series, minMax):
+    def generateYageoNumbers(self, series, minMax):
         code = 0
         yNumber = ""
         seriesNumbers = []
@@ -144,14 +145,13 @@ class yaegoResistors():
                     continue
                 seriesValues.append(str(EngNumber(v)))
         return seriesValues
-
-
+    
 
 if __name__ == '__main__':
-    myE96Series = yaegoResistors("K", "0603", "F", "R", "", "07")
+    myE96Series = yageoResistors("K", "0603", "F", "R", "", "07")
     ESeries = E96
-    E96YaegoNumbers = myE96Series.generateYaegoNumbers(ESeries, MinMaxE96)
+    E96YageoNumbers = myE96Series.generateYageoNumbers(ESeries, MinMaxE96)
     E96Values = myE96Series.generateValues(ESeries, MinMaxE96)
 
-    for n, v in zip(E96YaegoNumbers, E96Values):
+    for n, v in zip(E96YageoNumbers, E96Values):
         print(n + " -> " + str(v))
