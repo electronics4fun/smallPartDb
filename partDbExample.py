@@ -33,7 +33,7 @@ if __name__ == '__main__':
 
     # show info
     print(partDb)
-
+"""
     myE24Series = yageoResistors.yageoResistors("K", "0603", "F", "R", "", "07")
     ESeries = yageoResistors.E24
     E24YaegoNumbers = myE24Series.generateYageoNumbers(ESeries, yageoResistors.MinMaxE24)
@@ -251,4 +251,22 @@ if __name__ == '__main__':
     if status.status_code == 200:
         for f in partDb.footprints:
             print("id: " + str(f['id']) + ", name: " + f['name'] )
+"""
+print("List all parts")
+status = partDb.getParts()
+if status.status_code == 200:
+    for p in partDb.parts:
+        print(str(p['id']) + ": " + p['name'])
 
+print("get all storageLocations")
+status = partDb.getStore_Location()
+if status.status_code == 200:
+    for f in partDb.storage_location:
+        print("id: " + str(f['id']) + ", name: " + f['name'])
+
+storageLoaction = "LDOs"  # Put here the name of your storage location
+print("get all parts on x storageLocation")
+status = partDb.getPartsByStorage(storageLoaction)
+if status.status_code == 200:
+    for c in partDb.partsbyStorage:
+        print("id: " + str(c['id']) + ", name: " + c['name'])
