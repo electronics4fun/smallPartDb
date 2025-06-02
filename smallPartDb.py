@@ -72,7 +72,6 @@ class Endpoint():
         self.parameters = base_url + "parameters"
         self.parametersId = base_url + "parameters/{id}"
         self.partsearch = base_url + "parts.jsonld?name={phrase}"
-
         self.storage_Locations = base_url + "storage_locations"
         self.storage_LocationsId = base_url + "storage_locations/{id}"
 
@@ -88,7 +87,7 @@ class smallPartDb():
     attachments = []
     footprints = []
     attachmentTypes = []
-    storage_location = []
+    storageLocation = []
     partsbyStorage = []
     token = None
 
@@ -125,7 +124,7 @@ class smallPartDb():
             self.info = json.loads(r.text)
         else:
             self.info = None
-            raise RuntimeError("unable to get info")
+            raise RuntimeError("unable to get info (Error: " + str(r.status_code) + ")")
         return r
 
     def getCategories(self):
@@ -544,7 +543,6 @@ class smallPartDb():
         url = self.endpoint.parts.format()
         p = 1
         size = 500
-        storage = []
         junk = []
         part = []
         while (True):
@@ -569,10 +567,6 @@ class smallPartDb():
         self.parts = part
         return r
 
-
-
-        self.storage_location = storage_location
-        return r
     def getPartById(self, id):
         url = self.endpoint.partsId.format(id=id)
         r = self.r.get(url)
@@ -612,16 +606,12 @@ class smallPartDb():
         self.attachments = attachment
         return r
 
-
-    # New functions used to search all parts inside a storage location
-
-
     def getStore_Location(self):
         url = self.endpoint.storage_Locations.format()
         p = 1
         size = 500
         junk = []
-        storage_location = []
+        sLocation = []
         while (True):
             params = {'page': p, 'itemsPerPage': size}
             r = self.r.get(url, params=params)
@@ -629,35 +619,34 @@ class smallPartDb():
                 junk = json.loads(r.text)
             else:
                 junk = None
-                warnings.warn("getParts status_code: " + str(r.status_code))
+                warnings.warn("getStore_Location status_code: " + str(r.status_code))
                 return r
 
             if (len(junk) > 0):
                 for i in junk:
-                    storage_location.append(i)
+                    sLocation.append(i)
             else:
                 break
 
             p = p + 1
             junk.clear()
 
-            self.storage_location = storage_location
+            self.storageLocation = sLocation
             return r
 
     def lookupStorage(self, name):
         r = self.getStore_Location()
         if r.status_code != 200:
-            warnings.warn("lookupFootprint - getFootprints returned: " + str(r.status_code))
+            warnings.warn("lookupStorage - getStore_Location returned: " + str(r.status_code))
             return None
         id = None
-        if self.storage_location is not None and type(name) == str:
-            for p in self.storage_location:
+        if self.storageLocation is not None and type(name) == str:
+            for p in self.storageLocation:
                 if p['name'] == name:
                     id = str(p['id'])
         if id == None:
             warnings.warn("no storage found for >" + name + "<")
         return id
-
 
     def getPartsByStorage(self, storage):
         url = self.endpoint.parts.format()
@@ -692,7 +681,7 @@ class smallPartDb():
 
 if __name__ == '__main__':
 
-    with open("./smallPartDb/settings.yaml") as stream:
+    with open("./settings.yaml") as stream:
         try:
             settings = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
@@ -708,12 +697,18 @@ if __name__ == '__main__':
         for p in partDb.parts:
             print(str(p['id']) + ": " + p['name'])
 
-    print("search...")
-    resp = partDb.searchPart("BC547")
-    if resp.status_code == 200:
-        print(json.dumps(resp.text))
-    else:
-        print("Error while search: " + str(resp.status_code))
+    print("List all storage")
+    status = partDb.getStore_Location()
+    if status.status_code == 200:
+        for p in partDb.storageLocation:
+            print(str(p['id']) + ": " + p['name'])
+
+    # print("search...")
+    # resp = partDb.searchPart("BC547")
+    # if resp.status_code == 200:
+    #     print(json.dumps(resp.text))
+    # else:
+    #     print("Error while search: " + str(resp.status_code))
 
 
 
